@@ -18,7 +18,6 @@ app::app(const vec2 &size)
 	init_imgui();
 
 	running = window && renderer;
-	pixel = { 4, 4 };
 	max_iterations = 64;
 	zoom = 100.0;
 
@@ -124,11 +123,6 @@ auto app::draw_imgui() -> void
 			}
 
 			ImGui::SliderInt("Iterations", (int *)&max_iterations, 1, 1 << 11);
-
-			ImGui::SliderInt("Resolution", (int *)&pixel.x, 1, 10);
-			pixel.y = pixel.x;
-
-
 			ImGui::Text("Average %.3f ms/frame (%.0f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 		ImGui::End();
@@ -177,10 +171,10 @@ auto app::draw_fractal() -> void
 		}
 	};
 
-	SDL_SetRenderTarget(renderer, frame_buffer);
-	for (int y = 0; y < fractal_view.h; y += pixel.y)
+	static std::vector<uint8_t> pixels(fractal_view.w * fractal_view.h * 4);
+	for (int y = 0; y < fractal_view.h; ++y)
 	{
-		for (int x = 0; x < fractal_view.w; x += pixel.x)
+		for (int x = 0; x < fractal_view.w; ++x)
 		{
 			const auto pos = screen_to_world({ x, y });
 			const auto start = zen::complex(pos.x, pos.y);
@@ -188,19 +182,16 @@ auto app::draw_fractal() -> void
 			const auto iterations = iter_fractal(start);
 
 			const auto color = color_palette[(iterations / (float)max_iterations) * (color_palette.size() - 1)];
-			SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-			const SDL_Rect pixel_rect {
-				.x = x,
-				.y = y,
-				.w = pixel.x,
-				.h = pixel.y
-			};
-			SDL_RenderFillRect(renderer, &pixel_rect);
-			// SDL_RenderDrawPoint(renderer, x, y);
+			const size_t index = (y * fractal_view.w + x) * 4;
+			pixels[index + 0] = color.r;
+			pixels[index + 1] = color.g;
+			pixels[index + 2] = color.b;
+			pixels[index + 3] = color.a;
 		}
 	}
-	SDL_SetRenderTarget(renderer, nullptr);
+
+	SDL_UpdateTexture(frame_buffer, nullptr, pixels.data(), fractal_view.w * 4);
 }
 
 auto app::handle_events() -> void
@@ -258,6 +249,7 @@ auto app::handle_events() -> void
 					{
 						zoom *= 0.9f;
 					}
+
 					const auto mouse_after_zoom = screen_to_world(mouse_pos);
 					camera.x += (mouse_before_zoom.x - mouse_after_zoom.x);
 					camera.y += (mouse_before_zoom.y - mouse_after_zoom.y);

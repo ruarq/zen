@@ -73,7 +73,7 @@ constexpr auto sub(const Complex &lhs, const Complex &rhs)
 template<complex_type Complex>
 constexpr auto mul(const Complex &lhs, const Complex &rhs)
 {
-	return Complex(lhs.real * rhs.real - lhs.imag * rhs.imag, lhs.real * rhs.imag + rhs.real * lhs.imag);
+	return Complex(lhs.real * rhs.real - lhs.imag * rhs.imag, lhs.real * rhs.imag + lhs.imag * rhs.real);
 }
 
 /**
@@ -152,8 +152,8 @@ public:
 	 * @brief Default constructor, real=0, imag=0
 	 */
 	constexpr basic_complex()
-		: real(static_cast<real_t>(0.0))
-		, imag(static_cast<imag_t>(0.0))
+		: real((real_t)0.0)
+		, imag((imag_t)0.0)
 	{
 	}
 

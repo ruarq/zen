@@ -58,6 +58,5 @@ CREATE_SET_BY_EXPR(mandelbrot, z * z + c);
 // Some sets I found by myself (they obviously probably have already been found, but I gave them my own names)
 
 CREATE_SET_BY_EXPR(octopus, (c + z) * z + z * z * z + c * z * z + z);
-CREATE_SET_BY_EXPR(a, z * z * z * z + c);
 
 }

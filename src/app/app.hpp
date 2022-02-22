@@ -65,7 +65,6 @@ private:
 
 	vec2f camera;
 	const vec2 size;
-	vec2 pixel;
 	SDL_Rect fractal_view;
 
 	bool running;

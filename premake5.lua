@@ -9,6 +9,7 @@ project "zen-app"
 
 	files { "src/**.hpp", "src/**.cpp" }
 
+	buildoptions { "-mavx2" }
 	linkoptions ("`sdl2-config --libs`")
 	links { "fmt", "gmp", "gmpxx" }
 
