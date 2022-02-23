@@ -1,8 +1,8 @@
-#include "App/App.hpp"
+#include "Zen/App.hpp"
 
 auto main() -> int
 {
-	App::App app({ 1280, 720 });
+	Zen::App app({ 1280, 720 });
 	app.Run();
 
 	return 0;

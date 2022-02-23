@@ -8,10 +8,10 @@
 #include "../imgui/imgui_impl_sdl.h"
 #include "../imgui/imgui_impl_sdlrenderer.h"
 
-#include "../Zen/Complex.hpp"
-#include "../Zen/Fractals.hpp"
+#include "Complex.hpp"
+#include "Fractals.hpp"
 
-namespace App
+namespace Zen
 {
 
 enum FractalId : int

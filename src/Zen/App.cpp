@@ -1,6 +1,6 @@
 #include "App.hpp"
 
-namespace App
+namespace Zen
 {
 
 App::App(const Vec2 &size)
@@ -21,19 +21,23 @@ App::App(const Vec2 &size)
 	maxIterations = 64;
 	zoom = 100.0;
 
-	ResizeFrameBuffer({ 1280, 720 });
+	ResizeFrameBuffer(size);
 	camera.x = (-fractalView.w / 2.0f) / zoom;
 	camera.y = (-fractalView.h / 2.0f) / zoom;
 
 	// Set fractal to render
 	fractal = FractalId_Mandelbrot;
 
-	for (int i = 0; i < 244; ++i)
+	for (int i = 255; i > 0; --i)
 	{
-		const float factor = i / 243.0f;
-		colorPalette.push_back({ (uint8_t)(255 * factor), (uint8_t)(155 * factor), (uint8_t)(55 * factor), 255 });
+		const float factor = i / 55.0f;
+		colorPalette.push_back({
+			(uint8_t)(factor * 255),
+			(uint8_t)(factor * 100),
+			(uint8_t)(factor * 50),
+			255
+		});
 	}
-	colorPalette.push_back({ 0, 0, 0, 255 });
 }
 
 App::~App()
@@ -73,7 +77,6 @@ auto App::Run() -> void
 		DrawFractal();
 		DrawImGui();
 
-		
 		SDL_RenderPresent(renderer);
 		HandleEvents();
 	}
@@ -164,10 +167,10 @@ auto App::DrawFractal() -> void
 	auto iter_fractal = [&](const auto &complex) {
 		switch (fractal)
 		{
-			case FractalId_Mandelbrot: return Zen::Fractals::mandelbrot::iter(complex, maxIterations);
-			case FractalId_Octopus: return Zen::Fractals::octopus::iter(complex, maxIterations);
+			case FractalId_Mandelbrot: return Zen::Fractals::Mandelbrot::Iter(complex, maxIterations);
+			case FractalId_Octopus: return Zen::Fractals::Octopus::Iter(complex, maxIterations);
 			case FractalId_Custom: return 0ul;
-			default: return Zen::Fractals::mandelbrot::iter(complex, maxIterations);
+			default: return Zen::Fractals::Mandelbrot::Iter(complex, maxIterations);
 		}
 	};
 

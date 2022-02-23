@@ -19,7 +19,7 @@
 namespace Zen
 {
 
-template<typename Float>
+template<typename TFloat>
 class BasicComplex;
 
 template<typename T>
@@ -41,13 +41,13 @@ template<typename T>
 concept ComplexType = IsComplex<T>;
 
 template<ComplexType TComplex>
-constexpr auto operator==(const Complex &lhs, const Complex &rhs)
+constexpr auto operator==(const TComplex &lhs, const TComplex &rhs)
 {
 	return lhs.real == rhs.real && lhs.imag == rhs.imag;
 }
 
 template<ComplexType TComplex>
-constexpr auto operator!=(const Complex &lhs, const Complex &rhs)
+constexpr auto operator!=(const TComplex &lhs, const TComplex &rhs)
 {
 	return !(lhs == rhs);
 }
@@ -56,76 +56,76 @@ constexpr auto operator!=(const Complex &lhs, const Complex &rhs)
  * @brief Complex number addition
  */
 template<ComplexType TComplex>
-constexpr auto Add(const Complex &lhs, const Complex &rhs)
+constexpr auto Add(const TComplex &lhs, const TComplex &rhs)
 {
-	return Complex(lhs.real + rhs.real, lhs.imag + rhs.imag);
+	return TComplex(lhs.real + rhs.real, lhs.imag + rhs.imag);
 }
 
 template<ComplexType TComplex>
-constexpr auto Sub(const Complex &lhs, const Complex &rhs)
+constexpr auto Sub(const TComplex &lhs, const TComplex &rhs)
 {
-	return Complex(lhs.real - rhs.real, lhs.imag - rhs.imag);
+	return TComplex(lhs.real - rhs.real, lhs.imag - rhs.imag);
 }
 
 /**
  * @brief Complex number multiplication.
  */
 template<ComplexType TComplex>
-constexpr auto Mul(const Complex &lhs, const Complex &rhs)
+constexpr auto Mul(const TComplex &lhs, const TComplex &rhs)
 {
-	return Complex(lhs.real * rhs.real - lhs.imag * rhs.imag, lhs.real * rhs.imag + lhs.imag * rhs.real);
+	return TComplex(lhs.real * rhs.real - lhs.imag * rhs.imag, lhs.real * rhs.imag + lhs.imag * rhs.real);
 }
 
 /**
  * @brief Scale a complex number
  */
-template<ComplexType TComplex, typename Scalar>
-constexpr auto Mul(const Complex &complex, const Scalar scalar)
+template<ComplexType TComplex, typename TScalar>
+constexpr auto Mul(const TComplex &complex, const TScalar scalar)
 {
-	return Complex(complex.real * scalar, complex.imag * scalar);
+	return TComplex(complex.real * scalar, complex.imag * scalar);
 }
 
 /**
  * @brief Alias for zen::add
  */
 template<ComplexType TComplex>
-constexpr auto operator+(const Complex &lhs, const Complex &rhs)
+constexpr auto operator+(const TComplex &lhs, const TComplex &rhs)
 {
-	return Add<Complex>(lhs, rhs);
+	return Add<TComplex>(lhs, rhs);
 }
 
 /**
  * @brief Alias for zen::sub
  */
 template<ComplexType TComplex>
-constexpr auto operator-(const Complex &lhs, const Complex &rhs)
+constexpr auto operator-(const TComplex &lhs, const TComplex &rhs)
 {
-	return Sub<Complex>(lhs, rhs);
+	return Sub<TComplex>(lhs, rhs);
 }
 
 /**
  * @brief Alias for zen::mul
  */
 template<ComplexType TComplex>
-constexpr auto operator*(const Complex &lhs, const Complex &rhs)
+constexpr auto operator*(const TComplex &lhs, const TComplex &rhs)
 {
-	return Mul<Complex>(lhs, rhs);
+	return Mul<TComplex>(lhs, rhs);
 }
 
 /**
  * @brief Alias for zen::mul
  */
-template<ComplexType TComplex, typename Scalar>
-constexpr auto operator*(const Complex &complex, const Scalar scalar)
+template<ComplexType TComplex, typename TScalar>
+constexpr auto operator*(const TComplex &complex, const TScalar scalar)
 {
-	return Mul<Complex, Scalar>(complex, scalar);
+	return Mul<TComplex, TScalar>(complex, scalar);
 }
 
 /**
  * @brief Get the absolute value squared of a complex number
  */
 template<ComplexType TComplex>
-constexpr auto abs_sq(const Complex &complex)
+constexpr auto AbsSq(const TComplex &complex)
 {
 	return complex.real * complex.real + complex.imag * complex.imag;
 }
@@ -134,26 +134,26 @@ constexpr auto abs_sq(const Complex &complex)
  * @brief Get the absolute value of a complex number
  */
 template<ComplexType TComplex>
-constexpr auto abs(const Complex &complex)
+constexpr auto Abs(const TComplex &complex)
 {
-	return std::sqrt(abs_sq(complex));
+	return std::sqrt(AbsSq(complex));
 }
 
-template<typename Float>
+template<typename TFloat>
 struct BasicComplex
 {
 public:
-	using Value_t = Float;
-	using Real_t = Float;
-	using Imag_t = Float;
+	using TValue = TFloat;
+	using TReal = TFloat;
+	using TImag = TFloat;
 
 public:
 	/**
 	 * @brief Default constructor, real=0, imag=0
 	 */
 	constexpr BasicComplex()
-		: real((Real_t)0.0)
-		, imag((Imag_t)0.0)
+		: real((TReal)0.0)
+		, imag((TImag)0.0)
 	{
 	}
 
@@ -162,38 +162,38 @@ public:
 	 * @param real The real part of the complex number
 	 * @param imag The imaginary part of the complex number
 	 */
-	constexpr BasicComplex(const Real_t real, const Imag_t imag)
+	constexpr BasicComplex(const TReal real, const TImag imag)
 		: real(real)
 		, imag(imag)
 	{
 	}
 
 public:
-	constexpr auto operator+=(const BasicComplex<Float> &other)
+	constexpr auto operator+=(const BasicComplex<TFloat> &other)
 	{
 		*this = Add(*this, other);
 		return *this;
 	}
 
-	constexpr auto operator-=(const BasicComplex<Float> &other)
+	constexpr auto operator-=(const BasicComplex<TFloat> &other)
 	{
 		*this = Sub(*this, other);
 		return *this;
 	}
 
-	constexpr auto operator*=(const BasicComplex<Float> &other)
+	constexpr auto operator*=(const BasicComplex<TFloat> &other)
 	{
 		*this = Mul(*this, other);
 		return *this;
 	}
 
 public:
-	Real_t real;
-	Imag_t imag;
+	TReal real;
+	TImag imag;
 };
 
-template<typename Float>
-auto operator<<(std::ostream &out, const BasicComplex<Float> &complex) -> std::ostream &
+template<typename TFloat>
+auto operator<<(std::ostream &out, const BasicComplex<TFloat> &complex) -> std::ostream &
 {
 	out << "(" << complex.real << ", " << "" << complex.imag << "i)";
 	return out;
