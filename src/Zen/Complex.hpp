@@ -16,37 +16,37 @@
 	#define ZEN_COMPLEX_HAS_GMP 0
 #endif
 
-namespace zen
+namespace Zen
 {
 
 template<typename Float>
-class basic_complex;
+class BasicComplex;
 
 template<typename T>
-struct is_complex
+struct IsComplex_Value
 {
 	static auto constexpr value = false;
 };
 
 template<typename T>
-struct is_complex<basic_complex<T>>
+struct IsComplex_Value<BasicComplex<T>>
 {
 	static auto constexpr value = true;
 };
 
 template<typename T>
-constexpr auto is_complex_v = is_complex<T>::value;
+constexpr auto IsComplex = IsComplex_Value<T>::value;
 
 template<typename T>
-concept complex_type = is_complex_v<T>;
+concept ComplexType = IsComplex<T>;
 
-template<complex_type Complex>
+template<ComplexType TComplex>
 constexpr auto operator==(const Complex &lhs, const Complex &rhs)
 {
 	return lhs.real == rhs.real && lhs.imag == rhs.imag;
 }
 
-template<complex_type Complex>
+template<ComplexType TComplex>
 constexpr auto operator!=(const Complex &lhs, const Complex &rhs)
 {
 	return !(lhs == rhs);
@@ -55,14 +55,14 @@ constexpr auto operator!=(const Complex &lhs, const Complex &rhs)
 /**
  * @brief Complex number addition
  */
-template<complex_type Complex>
-constexpr auto add(const Complex &lhs, const Complex &rhs)
+template<ComplexType TComplex>
+constexpr auto Add(const Complex &lhs, const Complex &rhs)
 {
 	return Complex(lhs.real + rhs.real, lhs.imag + rhs.imag);
 }
 
-template<complex_type Complex>
-constexpr auto sub(const Complex &lhs, const Complex &rhs)
+template<ComplexType TComplex>
+constexpr auto Sub(const Complex &lhs, const Complex &rhs)
 {
 	return Complex(lhs.real - rhs.real, lhs.imag - rhs.imag);
 }
@@ -70,8 +70,8 @@ constexpr auto sub(const Complex &lhs, const Complex &rhs)
 /**
  * @brief Complex number multiplication.
  */
-template<complex_type Complex>
-constexpr auto mul(const Complex &lhs, const Complex &rhs)
+template<ComplexType TComplex>
+constexpr auto Mul(const Complex &lhs, const Complex &rhs)
 {
 	return Complex(lhs.real * rhs.real - lhs.imag * rhs.imag, lhs.real * rhs.imag + lhs.imag * rhs.real);
 }
@@ -79,8 +79,8 @@ constexpr auto mul(const Complex &lhs, const Complex &rhs)
 /**
  * @brief Scale a complex number
  */
-template<complex_type Complex, typename Scalar>
-constexpr auto mul(const Complex &complex, const Scalar scalar)
+template<ComplexType TComplex, typename Scalar>
+constexpr auto Mul(const Complex &complex, const Scalar scalar)
 {
 	return Complex(complex.real * scalar, complex.imag * scalar);
 }
@@ -88,43 +88,43 @@ constexpr auto mul(const Complex &complex, const Scalar scalar)
 /**
  * @brief Alias for zen::add
  */
-template<complex_type Complex>
+template<ComplexType TComplex>
 constexpr auto operator+(const Complex &lhs, const Complex &rhs)
 {
-	return add<Complex>(lhs, rhs);
+	return Add<Complex>(lhs, rhs);
 }
 
 /**
  * @brief Alias for zen::sub
  */
-template<complex_type Complex>
+template<ComplexType TComplex>
 constexpr auto operator-(const Complex &lhs, const Complex &rhs)
 {
-	return sub<Complex>(lhs, rhs);
+	return Sub<Complex>(lhs, rhs);
 }
 
 /**
  * @brief Alias for zen::mul
  */
-template<complex_type Complex>
+template<ComplexType TComplex>
 constexpr auto operator*(const Complex &lhs, const Complex &rhs)
 {
-	return mul<Complex>(lhs, rhs);
+	return Mul<Complex>(lhs, rhs);
 }
 
 /**
  * @brief Alias for zen::mul
  */
-template<complex_type Complex, typename Scalar>
+template<ComplexType TComplex, typename Scalar>
 constexpr auto operator*(const Complex &complex, const Scalar scalar)
 {
-	return mul<Complex, Scalar>(complex, scalar);
+	return Mul<Complex, Scalar>(complex, scalar);
 }
 
 /**
  * @brief Get the absolute value squared of a complex number
  */
-template<complex_type Complex>
+template<ComplexType TComplex>
 constexpr auto abs_sq(const Complex &complex)
 {
 	return complex.real * complex.real + complex.imag * complex.imag;
@@ -133,27 +133,27 @@ constexpr auto abs_sq(const Complex &complex)
 /**
  * @brief Get the absolute value of a complex number
  */
-template<complex_type Complex>
+template<ComplexType TComplex>
 constexpr auto abs(const Complex &complex)
 {
 	return std::sqrt(abs_sq(complex));
 }
 
 template<typename Float>
-struct basic_complex
+struct BasicComplex
 {
 public:
-	using value_t = Float;
-	using real_t = Float;
-	using imag_t = Float;
+	using Value_t = Float;
+	using Real_t = Float;
+	using Imag_t = Float;
 
 public:
 	/**
 	 * @brief Default constructor, real=0, imag=0
 	 */
-	constexpr basic_complex()
-		: real((real_t)0.0)
-		, imag((imag_t)0.0)
+	constexpr BasicComplex()
+		: real((Real_t)0.0)
+		, imag((Imag_t)0.0)
 	{
 	}
 
@@ -162,51 +162,51 @@ public:
 	 * @param real The real part of the complex number
 	 * @param imag The imaginary part of the complex number
 	 */
-	constexpr basic_complex(const real_t real, const imag_t imag)
+	constexpr BasicComplex(const Real_t real, const Imag_t imag)
 		: real(real)
 		, imag(imag)
 	{
 	}
 
 public:
-	constexpr auto operator+=(const basic_complex<Float> &other)
+	constexpr auto operator+=(const BasicComplex<Float> &other)
 	{
-		*this = add(*this, other);
+		*this = Add(*this, other);
 		return *this;
 	}
 
-	constexpr auto operator-=(const basic_complex<Float> &other)
+	constexpr auto operator-=(const BasicComplex<Float> &other)
 	{
-		*this = sub(*this, other);
+		*this = Sub(*this, other);
 		return *this;
 	}
 
-	constexpr auto operator*=(const basic_complex<Float> &other)
+	constexpr auto operator*=(const BasicComplex<Float> &other)
 	{
-		*this = mul(*this, other);
+		*this = Mul(*this, other);
 		return *this;
 	}
 
 public:
-	real_t real;
-	imag_t imag;
+	Real_t real;
+	Imag_t imag;
 };
 
 template<typename Float>
-auto operator<<(std::ostream &out, const basic_complex<Float> &complex) -> std::ostream &
+auto operator<<(std::ostream &out, const BasicComplex<Float> &complex) -> std::ostream &
 {
 	out << "(" << complex.real << ", " << "" << complex.imag << "i)";
 	return out;
 }
 
-using complex32 = basic_complex<float>;
-using complex64 = basic_complex<double>;
-using complex128 = basic_complex<__float128>;
+using Complex32 = BasicComplex<float>;
+using Complex64 = BasicComplex<double>;
+using Complex128 = BasicComplex<__float128>;
 
 #if ZEN_COMPLEX_HAS_GMP
-using complex_mpz  = basic_complex<mpz_class>;
+using complex_mpz  = BasicComplex<mpz_class>;
 #endif
 
-using complex = basic_complex<double>;
+using Complex = BasicComplex<double>;
 	
 }

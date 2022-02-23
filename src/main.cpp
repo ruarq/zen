@@ -1,9 +1,9 @@
-#include "app/app.hpp"
+#include "App/App.hpp"
 
 auto main() -> int
 {
-	app::app app({ 1280, 720 });
-	app.run();
+	App::App app({ 1280, 720 });
+	app.Run();
 
 	return 0;
 }
