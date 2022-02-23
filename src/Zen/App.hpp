@@ -10,6 +10,7 @@
 
 #include "Complex.hpp"
 #include "Fractals.hpp"
+#include "Canvas.hpp"
 
 namespace Zen
 {
@@ -51,8 +52,6 @@ private:
 
 	auto HandleEvents() -> void;
 
-	auto ResizeFrameBuffer(const Vec2 &size) -> void;
-
 	auto WorldToScreen(const Vec2f &worldCoord) -> Vec2;
 	auto ScreenToWorld(const Vec2 &screenCoord) -> Vec2f;
 
@@ -60,7 +59,7 @@ private:
 	SDL_Window *window = nullptr;
 	SDL_Renderer *renderer = nullptr;
 
-	SDL_Texture *frameBuffer = nullptr;
+	Canvas *canvas;
 
 	Vec2f camera;
 	const Vec2 size;

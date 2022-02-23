@@ -21,9 +21,9 @@ App::App(const Vec2 &size)
 	maxIterations = 64;
 	zoom = 100.0;
 
-	ResizeFrameBuffer(size);
-	camera.x = (-fractalView.w / 2.0f) / zoom;
-	camera.y = (-fractalView.h / 2.0f) / zoom;
+	canvas = new Canvas(renderer);
+
+	canvas->ResizeBuffer(size.x, size.y);
 
 	// Set fractal to render
 	fractal = FractalId_Mandelbrot;
@@ -42,7 +42,7 @@ App::App(const Vec2 &size)
 
 App::~App()
 {
-	SDL_DestroyTexture(frameBuffer);
+	delete canvas;
 
 	QuitImGui();
 
@@ -75,6 +75,8 @@ auto App::Run() -> void
 		SDL_RenderClear(renderer);
 
 		DrawFractal();
+		canvas->Render();
+
 		DrawImGui();
 
 		SDL_RenderPresent(renderer);
@@ -93,18 +95,20 @@ auto App::DrawImGui() -> void
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
 		ImGui::Begin("Fractal View");
 		{
-			const auto content_region_min = ImGui::GetWindowContentRegionMin();
-			const auto window_pos = ImGui::GetWindowPos();
-			fractalView.x = window_pos.x + content_region_min.x;
-			fractalView.y = window_pos.y + content_region_min.y;
+			const auto contentRegionMin = ImGui::GetWindowContentRegionMin();
+			const auto windowPos = ImGui::GetWindowPos();
+			fractalView.x = windowPos.x + contentRegionMin.x;
+			fractalView.y = windowPos.y + contentRegionMin.y;
 
-			const auto view_size = ImGui::GetContentRegionAvail();
-			if (view_size.x != fractalView.w || view_size.y != fractalView.h)
+			const auto viewSize = ImGui::GetContentRegionAvail();
+			if (viewSize.x != fractalView.w || viewSize.y != fractalView.h)
 			{
-				ResizeFrameBuffer({ (int)view_size.x, (int)view_size.y });
+				fractalView.w = viewSize.x;
+				fractalView.h = viewSize.y;
+				canvas->ResizeBuffer((int)viewSize.x, (int)viewSize.y);
 			}
 
-			ImGui::Image((void *)frameBuffer, view_size);
+			ImGui::Image((void *)canvas->texture, { (int)canvas->width, (int)canvas->height });
 		}
 		ImGui::End();
 		ImGui::PopStyleVar();
@@ -174,7 +178,6 @@ auto App::DrawFractal() -> void
 		}
 	};
 
-	static std::vector<uint8_t> pixels(fractalView.w * fractalView.h * 4);
 	for (int y = 0; y < fractalView.h; ++y)
 	{
 		for (int x = 0; x < fractalView.w; ++x)
@@ -183,18 +186,10 @@ auto App::DrawFractal() -> void
 			const auto start = Zen::Complex(pos.x, pos.y);
 
 			const auto iterations = iter_fractal(start);
-
 			const auto color = colorPalette[(iterations / (float)maxIterations) * (colorPalette.size() - 1)];
-
-			const size_t index = (y * fractalView.w + x) * 4;
-			pixels[index + 0] = color.r;
-			pixels[index + 1] = color.g;
-			pixels[index + 2] = color.b;
-			pixels[index + 3] = color.a;
+			canvas->DrawPoint(x, y, color);
 		}
 	}
-
-	SDL_UpdateTexture(frameBuffer, nullptr, pixels.data(), fractalView.w * 4);
 }
 
 auto App::HandleEvents() -> void
@@ -264,14 +259,6 @@ auto App::HandleEvents() -> void
 				break;
 		}
 	}
-}
-
-auto App::ResizeFrameBuffer(const Vec2 &size) -> void
-{
-	SDL_DestroyTexture(frameBuffer);
-	frameBuffer = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_TARGET, size.x, size.y);
-	fractalView.w = size.x;
-	fractalView.h = size.y;
 }
 
 auto App::WorldToScreen(const Vec2f &world_coord) -> Vec2
