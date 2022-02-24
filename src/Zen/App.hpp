@@ -12,15 +12,10 @@
 #include "Fractals.hpp"
 #include "Canvas.hpp"
 
+#define ZEN_UNUSED [[maybe_unused]]
+
 namespace Zen
 {
-
-enum FractalId : int
-{
-	FractalId_Mandelbrot,
-	FractalId_Octopus,
-	FractalId_Custom
-};
 
 template<typename T>
 struct BasicVec2
@@ -33,45 +28,46 @@ struct BasicVec2
 using Vec2 = BasicVec2<int>;
 using Vec2f = BasicVec2<double>;
 
-struct App
+class App
 {
 public:
-	App(const Vec2 &size);
-	~App();
+	virtual ~App();
 
 public:
-	auto Run() -> void;
+	void Init(const Vec2 &size);
+	void Run();
+
+protected:
+	virtual void OnInit() {}
+	virtual void OnUpdate() {}
+	virtual void OnEvent() {}
 
 private:
-	auto InitImGui() -> void;
-	auto QuitImGui() -> void;
-	auto DrawImGui() -> void;
-	auto EnableDockSpace() -> void;
+	void InitImGui();
+	void QuitImGui();
+	void DrawImGui();
+	void EnableDockSpace();
 
-	auto DrawFractal() -> void;
+	void DrawFractal();
 
-	auto HandleEvents() -> void;
+	void HandleEvents();
 
-	auto WorldToScreen(const Vec2f &worldCoord) -> Vec2;
-	auto ScreenToWorld(const Vec2 &screenCoord) -> Vec2f;
+protected:
+	std::string appName;
+	Canvas *canvas;
+	bool useDockSpace = true;
+	bool running;
+
+	bool leftMouseDown;
+	bool rightMouseDown;
+	Vec2 mousePos;
+	Vec2f mouseDelta;
+	int mouseWheel; // 1 = up, 0 = none, -1 = down
 
 private:
 	SDL_Window *window = nullptr;
 	SDL_Renderer *renderer = nullptr;
-
-	Canvas *canvas;
-
-	Vec2f camera;
-	const Vec2 size;
-	SDL_Rect fractalView;
-
-	bool running;
-
-	size_t maxIterations;
-	double zoom;
-
-	FractalId fractal;
-	std::vector<SDL_Color> colorPalette;
+	Vec2f canvasTopLeft; // top left position of where the canvas starts in screen space
 };
 
 }

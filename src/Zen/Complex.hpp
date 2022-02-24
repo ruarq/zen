@@ -193,7 +193,7 @@ public:
 };
 
 template<typename TFloat>
-auto operator<<(std::ostream &out, const BasicComplex<TFloat> &complex) -> std::ostream &
+std::ostream& operator<<(std::ostream &out, const BasicComplex<TFloat> &complex)
 {
 	out << "(" << complex.real << ", " << "" << complex.imag << "i)";
 	return out;
@@ -204,7 +204,7 @@ using Complex64 = BasicComplex<double>;
 using Complex128 = BasicComplex<__float128>;
 
 #if ZEN_COMPLEX_HAS_GMP
-using complex_mpz  = BasicComplex<mpz_class>;
+using ComplexMpz  = BasicComplex<mpz_class>; // TODO(ruarq): Fix segmentation fault issue when using to draw fractals
 #endif
 
 using Complex = BasicComplex<double>;
